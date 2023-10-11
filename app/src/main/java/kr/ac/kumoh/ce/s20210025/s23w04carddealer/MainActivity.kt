@@ -3,33 +3,38 @@ package kr.ac.kumoh.ce.s20210025.s23w04carddealer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import kr.ac.kumoh.ce.s20210025.s23w04carddealer.databinding.ActivityMainBinding
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     private lateinit var main: ActivityMainBinding
+    private lateinit var model: CardDealerViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
         main = ActivityMainBinding.inflate(layoutInflater)
         setContentView(main.root)
 
-        val card = Random.nextInt(52)
-        //val card = 33
-        //Log.i("Card!!!", "$card: ${getCardNumber(card)}")
+        model = ViewModelProvider(this)[CardDealerViewModel::class.java]
+        model.cards.observe(this, Observer {
+            val res = resources.getIdentifier(
+                getCardNumber(it[0]),
+                "drawable",
+                packageName
+            )
+            main.card1.setImageResource(res)
+        })
 
-        val res = resources.getIdentifier(
-            getCardNumber(card),
-            "drawable",
-            packageName
-        )
-
-        main.card1.setImageResource(res)
-        //main.card1.setImageResource(R.drawable.c_2_of_hearts)
+        main.btnShuffle.setOnClickListener {
+            model.shuffle()
+        }
     }
 
     private fun getCardNumber(c: Int) : String {
-        val shape = when (c / 13) {
+        var shape = when (c / 13) {
             0 -> "spades"
             1 -> "diamonds"
             2 -> "hearts"
@@ -46,6 +51,11 @@ class MainActivity : AppCompatActivity() {
             else -> "error"
         }
 
+        //if (number == "jack" || number == "queen" || number == "king")
+            //shape += "${shape}2"
+
+        if (number in arrayOf("jack", "queen", "king"))
+            shape += "${shape}2"
         return "c_${number}_of_$shape"
     }
 }
