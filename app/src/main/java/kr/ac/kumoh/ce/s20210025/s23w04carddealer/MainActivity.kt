@@ -20,12 +20,15 @@ class MainActivity : AppCompatActivity() {
 
         model = ViewModelProvider(this)[CardDealerViewModel::class.java]
         model.cards.observe(this, Observer {
-            val res = resources.getIdentifier(
-                getCardNumber(it[0]),
-                "drawable",
-                packageName
-            )
-            main.card1.setImageResource(res)
+            val res = IntArray(5)
+            for (i in it.indices) {
+                res[i] = resources.getIdentifier(
+                    getCardNumber(it[i]),
+                    "drawable",
+                    packageName
+                )
+            }
+            main.card1.setImageResource(res[0])
         })
 
         main.btnShuffle.setOnClickListener {
